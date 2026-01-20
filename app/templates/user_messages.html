@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Zprávy od {{ user.name }}{% endblock %}
+
+{% block content %}
+<div class="user-header">
+    <h1>Zprávy od {{ user.name }}</h1>
+    <p class="user-email">{{ user.email }}</p>
+    <p class="user-joined">Člen od: {{ user.created_at.strftime('%d.%m.%Y') }}</p>
+    <a href="{{ url_for('main.index') }}" class="btn btn-secondary">← Zpět na seznam</a>
+</div>
+
+{% if messages.items %}
+    <div class="messages-section">
+        <h2>Všechny zprávy ({{ messages.total }})</h2>
+        
+        {% for msg in messages.items %}
+            {{ message_card(msg) }}
+        {% endfor %}
+
+        <!-- Pagination -->
+        {% if messages.pages > 1 %}
+            <div class="pagination">
+                {% if messages.has_prev %}
+                    <a href="{{ url_for('main.user_messages', user_id=user.id, page=messages.prev_num) }}" class="btn btn-small">← Předchozí</a>
+                {% endif %}
+                
+                <span class="pagination-info">Strana {{ messages.page }} z {{ messages.pages }}</span>
+                
+                {% if messages.has_next %}
+                    <a href="{{ url_for('main.user_messages', user_id=user.id, page=messages.next_num) }}" class="btn btn-small">Další →</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+{% else %}
+    <div class="no-messages">
+        <p>Tento uživatel zatím nenapsal žádnou zprávu.</p>
+    </div>
+{% endif %}
+
+{% macro message_card(msg) %}
+    <div class="message-card">
+        <div class="message-header">
+            <span class="message-date" title="{{ msg.created_at.strftime('%d.%m.%Y %H:%M:%S') }}">
+                {{ msg.created_at.strftime('%d.%m.%Y %H:%M') }}
+            </span>
+        </div>
+        <p class="message-text">{{ msg.message }}</p>
+    </div>
+{% endmacro %}

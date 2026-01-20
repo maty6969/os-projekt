@@ -1,0 +1,173 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: guestbook
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: guestbook-config
+  namespace: guestbook
+data:
+  FLASK_ENV: "production"
+  PORT: "5000"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: guestbook-secrets
+  namespace: guestbook
+type: Opaque
+stringData:
+  SECRET_KEY: "change-me-in-production"
+  DATABASE_URL: "mssql+pyodbc:///?odbc_connect=Driver={ODBC Driver 17 for SQL Server};Server=mssql-server;Database=guestbook;User=sa;Password=MyP@ssw0rd;"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: guestbook-app
+  namespace: guestbook
+  labels:
+    app: guestbook
+    component: webapp
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: guestbook
+      component: webapp
+  template:
+    metadata:
+      labels:
+        app: guestbook
+        component: webapp
+    spec:
+      containers:
+      - name: guestbook
+        image: ghcr.io/YOUR_USERNAME/os-projekt:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5000
+          name: http
+        envFrom:
+        - configMapRef:
+            name: guestbook-config
+        - secretRef:
+            name: guestbook-secrets
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 5000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: guestbook-service
+  namespace: guestbook
+  labels:
+    app: guestbook
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 5000
+    protocol: TCP
+    name: http
+  selector:
+    app: guestbook
+    component: webapp
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: guestbook-network-policy
+  namespace: guestbook
+spec:
+  podSelector:
+    matchLabels:
+      app: guestbook
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector: {}
+    ports:
+    - protocol: TCP
+      port: 5000
+  egress:
+  - to:
+    - namespaceSelector: {}
+    ports:
+    - protocol: TCP
+      port: 1433
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+    ports:
+    - protocol: TCP
+      port: 53
+    - protocol: UDP
+      port: 53
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: guestbook-hpa
+  namespace: guestbook
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: guestbook-app
+  minReplicas: 2
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: guestbook-pdb
+  namespace: guestbook
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: guestbook

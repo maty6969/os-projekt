@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Kniha návštěv - Domů{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1>Vítejte v knize návštěv</h1>
+    <p>Podívejte se, co napsali naši návštěvníci</p>
+    <a href="{{ url_for('main.add_message') }}" class="btn btn-primary">Přidat svou zprávu</a>
+</div>
+
+{% if messages.items %}
+    <div class="messages-section">
+        <h2>Poslední zprávy ({{ messages.total }})</h2>
+        
+        {% for msg in messages.items %}
+            {{ message_card(msg) }}
+        {% endfor %}
+
+        <!-- Pagination -->
+        {% if messages.pages > 1 %}
+            <div class="pagination">
+                {% if messages.has_prev %}
+                    <a href="{{ url_for('main.index', page=messages.prev_num) }}" class="btn btn-small">← Předchozí</a>
+                {% endif %}
+                
+                <span class="pagination-info">Strana {{ messages.page }} z {{ messages.pages }}</span>
+                
+                {% if messages.has_next %}
+                    <a href="{{ url_for('main.index', page=messages.next_num) }}" class="btn btn-small">Další →</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+{% else %}
+    <div class="no-messages">
+        <p>Zatím zde nejsou žádné zprávy.</p>
+        <a href="{{ url_for('main.add_message') }}" class="btn btn-primary">Buďte první, kdo napíše zprávu!</a>
+    </div>
+{% endif %}
+
+{% macro message_card(msg) %}
+    <div class="message-card">
+        <div class="message-header">
+            <h3 class="message-author">
+                <a href="{{ url_for('main.user_messages', user_id=msg.user_id) }}">
+                    👤 {{ msg.user.name }}
+                </a>
+            </h3>
+            <span class="message-date" title="{{ msg.created_at.strftime('%d.%m.%Y %H:%M:%S') }}">
+                {{ msg.created_at.strftime('%d.%m.%Y %H:%M') }}
+            </span>
+        </div>
+        <p class="message-email">{{ msg.user.email }}</p>
+        <p class="message-text">{{ msg.message }}</p>
+    </div>
+{% endmacro %}
