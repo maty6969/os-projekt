@@ -75,6 +75,22 @@ def add_message():
     
     return render_template('add_message.html')
 
+@main_bp.route('/delete-message/<int:message_id>', methods=['POST'])
+def delete_message(message_id):
+    """Delete a message."""
+    message = db.get_or_404(Message, message_id)
+    
+    try:
+        db.session.delete(message)
+        db.session.commit()
+        flash('Příspěvek byl úspěšně smazán.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Chyba při mazání: {str(e)}', 'danger')
+    
+    # Redirect to index
+    return redirect(url_for('main.index'))
+
 @main_bp.route('/user/<int:user_id>')
 def user_messages(user_id):
     """Display all messages from a specific user."""

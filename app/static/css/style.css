@@ -124,6 +124,7 @@ body {
         transform: translateX(-20px);
         opacity: 0;
     }
+
     to {
         transform: translateX(0);
         opacity: 1;
@@ -294,6 +295,11 @@ body {
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: 15px;
+    gap: 15px;
+}
+
+.message-left {
+    flex: 1;
 }
 
 .message-author {
@@ -451,6 +457,28 @@ body {
     .pagination {
         flex-wrap: wrap;
     }
+}
+
+.btn-delete {
+    background-color: var(--danger-color);
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.btn-delete:hover {
+    background-color: #dc2626;
+    transform: scale(1.05);
+}
+
+.btn-delete:active {
+    transform: scale(0.95);
 }
 
 @media (max-width: 480px) {

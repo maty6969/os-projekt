@@ -1,6 +1,7 @@
 Flask==3.0.0
 Flask-SQLAlchemy==3.1.1
-pyodbc==5.0.1
 SQLAlchemy==2.0.23
 Werkzeug==3.0.1
 python-dotenv==1.0.0
+# Optional: pro SQL Server server
+# pyodbc==5.0.1

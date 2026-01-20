@@ -7,9 +7,10 @@ def create_app():
     app = Flask(__name__)
     
     # Configuration
+    # Pro lokální vývoj používáme SQLite, pro produkci SQL Server
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
         'DATABASE_URL',
-        'mssql+pyodbc:///?odbc_connect=Driver={ODBC Driver 17 for SQL Server};Server=localhost;Database=guestbook;Trusted_Connection=yes;'
+        'sqlite:///guestbook.db'
     )
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')

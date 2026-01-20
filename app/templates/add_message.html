@@ -1,56 +1,53 @@
 {% extends "base.html" %}
 
-{% block title %}Přidat zprávu{% endblock %}
+{% block title %}Přidat příspěvek{% endblock %}
 
 {% block content %}
 <div class="form-container">
-    <h1>Přidejte svou zprávu</h1>
-    <p class="form-subtitle">Napište nám zprávu do knihy návštěv</p>
+    <h1>Přidejte svůj příspěvek</h1>
+    <p class="form-subtitle">Přispějte do diskuze</p>
 
     <form method="POST" class="guestbook-form" novalidate>
         <div class="form-group">
             <label for="name">Jméno *</label>
-            <input 
-                type="text" 
-                id="name" 
-                name="name" 
+            <input
+                type="text"
+                id="name"
+                name="name"
                 class="form-control"
                 placeholder="Vaše jméno"
-                required 
+                required
                 minlength="2"
                 maxlength="120"
-                value="{{ request.form.get('name', '') }}"
-            >
+                value="{{ request.form.get('name', '') }}">
             <small>Minimálně 2 znaky</small>
         </div>
 
         <div class="form-group">
             <label for="email">Email *</label>
-            <input 
-                type="email" 
-                id="email" 
-                name="email" 
+            <input
+                type="email"
+                id="email"
+                name="email"
                 class="form-control"
                 placeholder="vase.email@priklad.cz"
                 required
                 maxlength="120"
-                value="{{ request.form.get('email', '') }}"
-            >
+                value="{{ request.form.get('email', '') }}">
             <small>Musí být platný email</small>
         </div>
 
         <div class="form-group">
-            <label for="message">Zpráva *</label>
-            <textarea 
-                id="message" 
-                name="message" 
+            <label for="message">Příspěvek *</label>
+            <textarea
+                id="message"
+                name="message"
                 class="form-control"
-                placeholder="Napište vaši zprávu..."
+                placeholder="Napište svůj příspěvek..."
                 rows="6"
                 required
                 minlength="5"
-                maxlength="1000"
-            >{{ request.form.get('message', '') }}</textarea>
+                maxlength="1000">{{ request.form.get('message', '') }}</textarea>
             <small>Minimálně 5 znaků, maximálně 1000 znaků</small>
             <div class="character-count">
                 <span id="charCount">0</span>/1000
@@ -58,8 +55,10 @@
         </div>
 
         <div class="form-actions">
-            <button type="submit" class="btn btn-primary">Odeslat zprávu</button>
-            <a href="{{ url_for('main.index') }}" class="btn btn-secondary">Zrušit</a>
+            <button type="submit" class="btn btn-primary">Odeslat
+                příspěvek</button>
+            <a href="{{ url_for('main.index') }}"
+                class="btn btn-secondary">Zrušit</a>
         </div>
     </form>
 </div>
